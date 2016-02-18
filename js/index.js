@@ -1,7 +1,7 @@
 window.onload = function (){
 	var canvas = document.querySelector('#canvas');
 	var canvas1 = document.querySelector('#canvas1');
-	var hiuqi = document.querySelector('#hiuqi');
+	// var hiuqi = document.querySelector('#hiuqi');
 	ctx = canvas.getContext('2d');
 	ctx1 = canvas.getContext('2d');
 
@@ -98,7 +98,7 @@ window.onload = function (){
 	// luozi(4,4,false)
 	var flag = true;
 	var qizi = {};
-	canvas.onclick = function(e){
+	canvas1.onclick = function(e){
 		var ev = window.event||e;
 		var x = Math.round((ev.offsetX-20.5)/40);
 		var y = Math.round((ev.offsetY-20.5)/40);
@@ -116,13 +116,13 @@ window.onload = function (){
 			luozi(x,y,qizi[i]=='black'?true:false);
 		}
 	}
-	huiqi.onclick = function(){
-
-	}
-	canvas.ondblclick = function(){
+	// huiqi.onclick = function(){
+	// 	ev.stopPropagation();
+	// }
+	canvas.ondblclick = function(ev){
 		ev.stopPropagation();
 	}
-	canvas1.ondblclick = function(){
+	canvas1.ondblclick = function(ev){
 		ev.stopPropagation();
 	}
 	document.ondblclick = function(){
