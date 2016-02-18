@@ -106,6 +106,7 @@ window.onload = function (){
 		qizi[x+'_'+y] = flag?'black':'white';
 		luozi(x,y,flag);
 		flag = !flag;
+		localStorage.flag=flag;
 		localStorage.data = JSON.stringify(qizi);
 	}
 	if(localStorage.data){
@@ -115,14 +116,12 @@ window.onload = function (){
 			var y = i.split('_')[1];
 			luozi(x,y,qizi[i]=='black'?true:false);
 		}
+		flag = !Boolean(localStorage.flag);
 	}
-	// huiqi.onclick = function(){
-	// 	ev.stopPropagation();
-	// }
-	canvas.ondblclick = function(ev){
+	canvas.ondblclick = function(){
 		ev.stopPropagation();
 	}
-	canvas1.ondblclick = function(ev){
+	canvas1.ondblclick = function(){
 		ev.stopPropagation();
 	}
 	document.ondblclick = function(){
