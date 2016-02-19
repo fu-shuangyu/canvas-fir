@@ -1,11 +1,13 @@
 window.onload = function (){
 	var canvas = document.querySelector('#canvas');
 	var canvas1 = document.querySelector('#canvas1');
+	var sucai = document.querySelector('#sucai');
 	// var hiuqi = document.querySelector('#hiuqi');
 	var ctx = canvas.getContext('2d');
 	var ctx1 = canvas.getContext('2d');
 	var huaqipan = function(){
 		//画横线
+		ctx.clearRect(0,0,600,600);
 		var movey=20.5;
 		for (var i = 0; i < 15; i++) {
 			ctx.beginPath();
@@ -58,8 +60,18 @@ window.onload = function (){
 		color：记录黑子白子
 	*/
 
-
+	//用图片裁出棋子
 	var luozi = function(x,y,color){
+		var qizix = x*40+2.5;
+		var qiziy = y*40+2.5;
+		if(color){
+			ctx.drawImage(sucai,0,0,78,79,qizix,qiziy,36,36);
+		}else{
+			ctx.drawImage(sucai,79,0,78,78,qizix,qiziy,36,36);
+		}
+	}
+	//用画布画下棋子
+	var luozi2 = function(x,y,color){
 		var qizix = x*40+20.5;
 		var qiziy = y*40+20.5;
 		var black = ctx1.createRadialGradient(qizix,qiziy,3,qizix,qiziy,18);
@@ -84,8 +96,35 @@ window.onload = function (){
 		var x = Math.round((ev.offsetX-20.5)/40);
 		var y = Math.round((ev.offsetY-20.5)/40);
 		if(qizi[x+'_'+y]){return;}
+		luozi(x,y,flag);		
 		qizi[x+'_'+y] = flag?'black':'white';
-		luozi(x,y,flag);
+		if(flag){
+			if(panduan(x,y,'black')){
+				alert('黑棋赢');
+				if(confirm('是否再来一局')){
+					localStorage.clear();
+					qizi = {};
+					huaqipan();
+					kaiguan=true;
+					return;
+				}else{
+					canvas1.onclick = null;
+				}
+			}
+		}else{
+			if(panduan(x,y,'white')){
+				alert('白棋赢');
+				if(confirm('是否再来一局')){
+					localStorage.clear();
+					qizi = {};
+					huaqipan();
+					kaiguan = true;
+					return;
+				}else{
+					canvas1.onclick = null;
+				}
+			}
+		}
 		flag = !flag;
 		localStorage.data = JSON.stringify(qizi);
 		if(!flag){
@@ -105,6 +144,44 @@ window.onload = function (){
 		}
 	}
 	
+	//判断谁嬴谁输
+	var filter = function(color){
+		var r = {};
+		for(var i in qizi){
+			if(qizi[i]==color){
+				r[i]=qizi[i];
+			}
+		}
+		return r;
+	}
+	var xy2id = function(x,y){
+		return x+'_'+y;
+	}
+	var panduan = function(x,y,color){
+		//判断color是黑子还是白子
+		var shuju = filter(color);
+		var tx,ty,hang=1,shu = 1,zuoxie = 1,youxie=1;
+		tx=x;ty=y;while(shuju[xy2id(tx-1,ty)]){tx--;hang++}
+		tx=x;ty=y;while(shuju[xy2id(tx+1,ty)]){tx++;hang++}
+		if(hang>=5){
+			return true;
+		}
+		tx=x;ty=y;while(shuju[xy2id(tx,ty-1)]){ty--;shu++}
+		tx=x;ty=y;while(shuju[xy2id(tx,ty+1)]){ty++;shu++}
+		if(shu>=5){
+			return true;
+		}
+		tx=x;ty=y;while(shuju[xy2id(tx-1,ty-1)]){tx--;ty--;zuoxie++}
+		tx=x;ty=y;while(shuju[xy2id(tx+1,ty+1)]){tx++;ty++;zuoxie++}
+		if(zuoxie>=5){
+			return true;
+		}
+		tx=x;ty=y;while(shuju[xy2id(tx+1,ty-1)]){tx++;ty--;youxie++}
+		tx=x;ty=y;while(shuju[xy2id(tx-1,ty+1)]){tx--;ty++;youxie++}
+		if(youxie>=5){
+			return true;
+		}
+	}
 	canvas.ondblclick = function(){
 		ev.stopPropagation();
 	}
