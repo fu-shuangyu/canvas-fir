@@ -105,7 +105,7 @@ window.onload = function (){
 					localStorage.clear();
 					qizi = {};
 					huaqipan();
-					kaiguan=true;
+					flag=true;
 					return;
 				}else{
 					canvas1.onclick = null;
@@ -118,7 +118,7 @@ window.onload = function (){
 					localStorage.clear();
 					qizi = {};
 					huaqipan();
-					kaiguan = true;
+					flag = true;
 					return;
 				}else{
 					canvas1.onclick = null;
@@ -192,6 +192,10 @@ window.onload = function (){
 		localStorage.clear();
 		location.reload();
 	}
+
+	
+
+
 
 }
 
