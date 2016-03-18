@@ -1,10 +1,12 @@
 window.onload = function (){
 	var canvas = document.querySelector('#canvas');
 	var canvas1 = document.querySelector('#canvas1');
+	// var canvas2 = document.querySelector('#canvas2');
 	var sucai = document.querySelector('#sucai');
 	// var hiuqi = document.querySelector('#hiuqi');
 	var ctx = canvas.getContext('2d');
-	var ctx1 = canvas.getContext('2d');
+	var ctx1 = canvas1.getContext('2d');
+	// var ctx2 = canvas2.getContext('2d');
 	var huaqipan = function(){
 		//画横线
 		ctx.clearRect(0,0,600,600);
@@ -188,18 +190,183 @@ window.onload = function (){
 	canvas1.ondblclick = function(){
 		ev.stopPropagation();
 	}
-	document.ondblclick = function(){
+	sucai.ondblclick = function(){
+		ev.stopPropagation();
+	}
+	var cw = document.documentElement.clientWidth;
+	var ch = document.documentElement.clientHeight;
+	var bgi = document.querySelector('.dbgimg');
+	bgi.style.cssText = 'height:'+ch+'px;width:'+cw+'px';
+	window.onresize= function(){
+		var cw = document.documentElement.clientWidth;
+		var ch = document.documentElement.clientHeight;
+		var bgi = document.querySelector('.dbgimg');
+		bgi.style.cssText = 'height:'+ch+'px;width:'+cw+'px';
+	}
+
+
+	var star = document.querySelector('.star');
+	var restar = document.querySelector('.restar');
+	var bg = document.querySelector('.bg');
+	star.onclick = function(){
+		canvas.style.display = 'block';
+		restar.style.display = 'block';
+		star.style.display = 'block';
+		canvas1.style.display = 'block';
+		bg.style.display = 'block';
+		star.style.display = 'none';
+	}
+	var btn1 = document.getElementsByClassName('restar')[0];
+	btn1.onclick = function(){
 		localStorage.clear();
 		location.reload();
 	}
 
-	
+	/*//保存页面作为PNG图片
+	var link = document.createElement('a');
+	link.innerHTML = 'download image';
+	link.style.cssText = 'position:absolute;color:#fff;background:#ff6700;'
+	link.addEventListener('click', function(ev) {
+	    link.href = canvas.toDataURL();
+	    link.download = "mypainting.png";
+	}, false);
+
+	document.body.appendChild(link);*/
+
+
+
+  /* //钟表
+	var drawClock = function(){
+		var d = new Date();
+		var h = d.getHours();
+		var m = d.getMinutes();
+		var s = d.getSeconds();
+		ctx2.clearRect(0,0,200,200);
+		//保存一个干净的画布状态
+		ctx2.save();
+		//移动画布原点到中心
+		ctx2.translate(100,100);
+		//表盘最外的圆盘
+		ctx2.save();
+		ctx2.shadowoffsetX = 0;
+		ctx2.shadowoffsetY = 0;
+		ctx2.shadowBlur = 10;
+		ctx2.shadowColor = 'rgba(0,0,0,1)';
+		ctx2.beginPath();
+		ctx2.strokeStyle = '#2af';
+		ctx2.lineWidth = 6;
+		ctx2.arc(0,0,90,0,Math.PI*2);
+		ctx2.stroke();
+		ctx2.restore();
+
+
+		//用循环表盘针
+		ctx2.save();
+		ctx2.beginPath();
+		ctx2.strokeStyle = '#333';
+		ctx2.lineWidth = 5;
+		//花了表盘的内表盘
+		ctx2.arc(0,0,60,0,Math.PI*2);
+		ctx2.stroke();
+		ctx2.lineWidth = 4;
+		ctx2.lineCap = 'round';
+		for (var i = 1; i < 61; i++) {
+			ctx2.rotate(Math.PI/30);
+			ctx2.beginPath();
+			if(i%5 == 0){
+				ctx2.lineWidth = 4;
+				ctx2.moveTo(48,0);
+			}else{
+				ctx2.lineWidth = 2;
+				ctx2.moveTo(55,0);
+			}
+			ctx2.lineTo(60,0);
+			ctx2.stroke();
+		};
+
+		ctx2.restore();
+
+		//时钟时针
+		ctx2.save();
+		ctx2.rotate((360*(h*60*60+m*60+s)/43200)/180*Math.PI);
+		ctx2.beginPath();
+		ctx2.lineWidth = 12;
+		ctx2.moveTo(0,20);ctx.lineCap = 'round';
+		ctx2.lineTo(0,-100);
+		ctx2.stroke();
+		ctx2.restore();
+
+		//时钟分针
+		ctx2.save();
+		
+		ctx2.rotate((360*(m*60+s)/3600)/180*Math.PI);
+
+		ctx2.beginPath();
+		ctx2.strokeStyle = '#000';
+		ctx2.lineWidth = 8;
+		ctx2.lineCap = 'round';
+		ctx2.moveTo(0,20);
+		ctx2.lineTo(0,-160);
+		ctx2.stroke();
+		ctx2.restore();
+
+
+		
+		//表盘秒针
+		ctx2.save();
+		// ctx.rotate(x);
+		ctx2.rotate(Math.PI/30*s);
+
+		ctx2.beginPath();
+		ctx2.strokeStyle = '#f00';
+		ctx2.lineWidth = 8;
+		ctx2.lineCap = 'round';
+		ctx2.moveTo(0,20);
+		ctx2.lineTo(0,-150);
+		ctx2.stroke();
+		ctx2.moveTo(0,-150);
+		ctx2.fillStyle = '#f00';
+		ctx2.arc(0,-100,12,0,Math.PI*2);
+		ctx2.fill();
+		ctx2.save();
+		ctx2.beginPath();
+		ctx2.fillStyle = '#fff';
+		ctx2.arc(0,-100,9,0,Math.PI*2);
+		ctx2.fill();
+		ctx2.restore();
+		//时钟原点嵌套的两个圆
+		ctx2.save();
+		ctx2.beginPath();
+		ctx2.fillStyle = 'red';
+		ctx2.arc(0,0,10,0,Math.PI*2);
+		ctx2.fill();
+		ctx2.restore();
+		ctx2.save();
+		ctx2.restore();
+		ctx2.beginPath();
+		ctx2.fillStyle = '#535353';
+		ctx2.arc(0,0,5,0,Math.PI*2);
+		ctx2.fill();
+	    ctx2.restore();
+		
+
+	//复原干净的画布
+		ctx2.restore();
+		requestAnimationFrame(drawClock);
+	}
+   //复原一开始保存的干净的画布状态
+   ctx2.restore();
+   // drawClock();
+   requestAnimationFrame(drawClock);*/
+
+
+
 
 
 
 }
 
-
+ 
 
 /*	var lingrad = ctx.createLinearGradient(20,300,580,300);
     lingrad.addColorStop(0,'red');
