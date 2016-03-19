@@ -6,53 +6,78 @@ window.onload = function (){
 	// var hiuqi = document.querySelector('#hiuqi');
 	var ctx = canvas.getContext('2d');
 	var ctx1 = canvas1.getContext('2d');
+	var star = document.querySelector('.star');
+		var restar = document.querySelector('.restar');
+		var bg = document.querySelector('.bg');
+	var btn1 = document.getElementsByClassName('restar')[0];
+
+	var _xx = 22;
+	var _yy = 6.5;
+	var _zz = 314;
+	var W = document.documentElement.clientWidth;
+	var z = [ 3*_xx + _yy, 11*_xx + _yy];
+	var _r = 3;
+	var _aa = 320;
+	var _qizibanjing  = 20;
+
+	if(W >= 768){
+	    canvas.width = 600;
+	    canvas.height = 600;
+	    _xx = 40;
+	    _yy = 20.5;
+	    _zz = 580;
+	    z = [140.5,460.5];
+	    _r = 3;
+	    _aa = 600;
+	    _qizibanjing  = 36;
+	    canvas.addEventListener('click',handle);
+		btn1.onclick = function(){
+			localStorage.clear();
+			location.reload();
+		}
+	}
+
+
+
 	// var ctx2 = canvas2.getContext('2d');
 	var huaqipan = function(){
 		//画横线
 		ctx.clearRect(0,0,600,600);
-		var movey=20.5;
+		var movey=_yy;
 		for (var i = 0; i < 15; i++) {
 			ctx.beginPath();
-			var lingrad = ctx.createLinearGradient(20.5,20.5,580,20.5);
-		    lingrad.addColorStop(0.5,'red');
-		    lingrad.addColorStop(1,'blue');
-			ctx.strokeStyle = lingrad;
-			ctx.moveTo(20.5,movey);
-			ctx.lineTo(580,movey);
-			movey+=40;
+			ctx.strokeStyle = 'black';
+			ctx.moveTo(_yy,movey);
+			ctx.lineTo(_zz,movey);
+			movey+=_xx;
 			ctx.stroke();
 		};
-		var movex=20.5;
+		var movex=_yy;
 		for (var i = 0; i < 15; i++) {
-			var lingrad1 = ctx.createLinearGradient(20.5,20.5,580,580);
-		    lingrad1.addColorStop(0.5,'orange');
-		    lingrad1.addColorStop(1,'purple');
-			ctx.strokeStyle = lingrad1;			
+			ctx.strokeStyle = 'black';			
 			ctx.beginPath();
-			ctx.moveTo(movex,20);
-			ctx.lineTo(movex,580);
-			movex+=40;
+			ctx.moveTo(movex,_yy);
+			ctx.lineTo(movex,_zz);
+			movex+=_xx;
 			ctx.stroke();
 		};
 		
 
 		//四个角上的点
-		var z=[140.5,460.5];
 		for (var i = 0; i < z.length; i++) {
 			for (var j = 0; j < z.length; j++) {
 				ctx.beginPath();
-				ctx.arc(z[i],z[j],3,0,Math.PI*2);
+				ctx.arc(z[i],z[j],_r,0,Math.PI*2);
 				ctx.fill();
 			};
 		};
 		//正中间黑点
-		ctx.moveTo(300.5,300.5);
+		ctx.moveTo(_aa/2+0.5,_aa/2+0.5);
 		ctx.beginPath();
-		ctx.arc(300.5,300.5,3,0,Math.PI*2);
+		ctx.arc(_aa/2+0.5,_aa/2+0.5,_r,0,Math.PI*2);
 		ctx.fill();
 	}
 	huaqipan();
-	
 
 
 	
@@ -64,16 +89,16 @@ window.onload = function (){
 
 	//用图片裁出棋子
 	var luozi = function(x,y,color){
-		var qizix = x*40+2.5;
-		var qiziy = y*40+2.5;
-		if(color){
-			ctx.drawImage(sucai,0,0,78,79,qizix,qiziy,36,36);
+		var qizix = x*_xx+0.5;
+		var qiziy = y*_xx+0.5;
+		if(color=='black'){
+			ctx.drawImage(sucai,0,0,78,79,qizix,qiziy,_qizibanjing,_qizibanjing);
 		}else{
-			ctx.drawImage(sucai,79,0,78,78,qizix,qiziy,36,36);
+			ctx.drawImage(sucai,79,0,78,78,qizix,qiziy,_qizibanjing,_qizibanjing);
 		}
 	}
 	//用画布画下棋子
-	var luozi2 = function(x,y,color){
+	/*var luozi2 = function(x,y,color){
 		var qizix = x*40+20.5;
 		var qiziy = y*40+20.5;
 		var black = ctx1.createRadialGradient(qizix,qiziy,3,qizix,qiziy,18);
@@ -87,55 +112,104 @@ window.onload = function (){
 		ctx1.beginPath();
 		ctx1.arc(qizix,qiziy,20,0,Math.PI*2);
 		ctx1.fill();
-	}
+	}*/
 
+	var kongbai = {};
+	for (var i = 0; i < 15; i++) {
+		for (var j = 0; j < 15; j++) {
+			kongbai[i+'_'+j] = true;
+		}
+	}
 	//	flag：记录谁该落子
 	var flag = true;
 	flag = localStorage.flag?false:true;
 	var qizi = {};
-	canvas1.onclick = function(e){
-		var ev = window.event||e;
-		var x = Math.round((ev.offsetX-20.5)/40);
-		var y = Math.round((ev.offsetY-20.5)/40);
-		if(qizi[x+'_'+y]){return;}
-		luozi(x,y,flag);		
-		qizi[x+'_'+y] = flag?'black':'white';
-		if(flag){
-			if(panduan(x,y,'black')){
-				alert('黑棋赢');
-				if(confirm('是否再来一局')){
-					localStorage.clear();
-					qizi = {};
-					huaqipan();
-					flag=true;
-					return;
-				}else{
-					canvas1.onclick = null;
-				}
-			}
-		}else{
-			if(panduan(x,y,'white')){
-				alert('白棋赢');
-				if(confirm('是否再来一局')){
-					localStorage.clear();
-					qizi = {};
-					huaqipan();
-					flag = true;
-					return;
-				}else{
-					canvas1.onclick = null;
-				}
-			}
-		}
-		flag = !flag;
-		localStorage.data = JSON.stringify(qizi);
-		if(!flag){
-			localStorage.flag=1;
-		}else{
-			localStorage.removeItem('flag');
-		}
-		
+	var ai = function(){
+		do{
+			var x = Math.floor( Math.random()*15 );
+			var y = Math.floor( Math.random()*15 );
+		}while( qizi[ x+'_'+y ] );
+		return {x:x,y:y};
 	}
+	var fangshouAI = function(){
+		var max = -10000000;
+		var xx = {};
+		for( var i in kongbai){
+			var pos = i;
+			var x = panduan( Number(pos.split('_')[0]),Number(pos.split('_')[1]),'black' );
+			if( x>max ){
+				max = x;
+				xx.x = pos.split('_')[0];
+				xx.y = pos.split('_')[1];
+			}
+		}
+		var max2 = -10000000;
+		var yy = {};
+		for( var i in kongbai){
+			var pos = i;
+			var x = panduan( Number(pos.split('_')[0]),Number(pos.split('_')[1]),'white' );
+			if( x>max2 ){
+				max2 = x;
+				yy.x = pos.split('_')[0];
+				yy.y = pos.split('_')[1];
+			}
+		}
+		if( max2 > max ){
+			return yy;
+		}
+		return xx;
+	}
+	function handle(e){
+		var ev = window.event||e;
+		//判断落子的x和y的值
+		var x = Math.round((ev.offsetX-_yy)/_xx);
+		var y = Math.round((ev.offsetY-_yy)/_xx);
+		if(e.type == 'tap'){
+			var x =  Math.round( (ev.position.x - canvas.offsetLeft - _yy)/_xx );
+			var y =  Math.round( (ev.position.y - canvas.offsetTop - _yy)/_xx );
+		}
+		if(qizi[x+'_'+y]){return;}
+		luozi(x,y,'black');		
+		qizi[x+'_'+y] = 'black';
+		delete kongbai[x+'_'+y];
+
+		
+		var pos = fangshouAI();
+		luozi(pos.x,pos.y,'white');
+		qizi[pos.x+'_'+pos.y] = 'white';
+		delete kongbai[pos.x+'_'+pos.y];
+		if( panduan(x,y,'black') >= 5 ){
+			alert('黑棋赢');
+			if(confirm('是否再来一局')){
+			    localStorage.clear();
+			    qizi = {};
+			    huaqipan();
+			    flag=true;
+			    kongbai = {};
+			    return;
+			}else{
+			    canvas1.onclick = null;
+			}
+		}
+
+
+		if( panduan(Number(pos.x),Number(pos.y),'white') >= 5 ){
+			alert('白棋赢');
+			if(confirm('是否再来一局')){
+			    localStorage.clear();
+			    qizi = {};
+			    huaqipan();
+			    flag=true;
+			    kongbai = {};
+			    return;
+			}else{
+			    canvas1.onclick = null;
+			}
+
+		}
+	}
+	touch.on(canvas1,'tap',handle);
+
 	//如果本地存储中有数据，读取这些数据到页面中
 	if(localStorage.data){
 		qizi = JSON.parse(localStorage.data);
@@ -165,24 +239,13 @@ window.onload = function (){
 		var tx,ty,hang=1,shu = 1,zuoxie = 1,youxie=1;
 		tx=x;ty=y;while(shuju[xy2id(tx-1,ty)]){tx--;hang++}
 		tx=x;ty=y;while(shuju[xy2id(tx+1,ty)]){tx++;hang++}
-		if(hang>=5){
-			return true;
-		}
 		tx=x;ty=y;while(shuju[xy2id(tx,ty-1)]){ty--;shu++}
 		tx=x;ty=y;while(shuju[xy2id(tx,ty+1)]){ty++;shu++}
-		if(shu>=5){
-			return true;
-		}
 		tx=x;ty=y;while(shuju[xy2id(tx-1,ty-1)]){tx--;ty--;zuoxie++}
 		tx=x;ty=y;while(shuju[xy2id(tx+1,ty+1)]){tx++;ty++;zuoxie++}
-		if(zuoxie>=5){
-			return true;
-		}
 		tx=x;ty=y;while(shuju[xy2id(tx+1,ty-1)]){tx++;ty--;youxie++}
 		tx=x;ty=y;while(shuju[xy2id(tx-1,ty+1)]){tx--;ty++;youxie++}
-		if(youxie>=5){
-			return true;
-		}
+		return Math.max(hang,shu,zuoxie,youxie);
 	}
 	canvas.ondblclick = function(){
 		ev.stopPropagation();
@@ -205,22 +268,20 @@ window.onload = function (){
 	}
 
 
-	var star = document.querySelector('.star');
-	var restar = document.querySelector('.restar');
-	var bg = document.querySelector('.bg');
-	star.onclick = function(){
+	
+	function bl(){
 		canvas.style.display = 'block';
 		restar.style.display = 'block';
-		star.style.display = 'block';
 		canvas1.style.display = 'block';
 		bg.style.display = 'block';
-		star.style.display = 'none';
+		star.style.display = 'none';		
 	}
-	var btn1 = document.getElementsByClassName('restar')[0];
-	btn1.onclick = function(){
+	touch.on(star,'tap',bl);
+	
+	touch.on(btn1,'tap',function(){
 		localStorage.clear();
 		location.reload();
-	}
+	})
 
 	/*//保存页面作为PNG图片
 	var link = document.createElement('a');
@@ -232,137 +293,6 @@ window.onload = function (){
 	}, false);
 
 	document.body.appendChild(link);*/
-
-
-
-  /* //钟表
-	var drawClock = function(){
-		var d = new Date();
-		var h = d.getHours();
-		var m = d.getMinutes();
-		var s = d.getSeconds();
-		ctx2.clearRect(0,0,200,200);
-		//保存一个干净的画布状态
-		ctx2.save();
-		//移动画布原点到中心
-		ctx2.translate(100,100);
-		//表盘最外的圆盘
-		ctx2.save();
-		ctx2.shadowoffsetX = 0;
-		ctx2.shadowoffsetY = 0;
-		ctx2.shadowBlur = 10;
-		ctx2.shadowColor = 'rgba(0,0,0,1)';
-		ctx2.beginPath();
-		ctx2.strokeStyle = '#2af';
-		ctx2.lineWidth = 6;
-		ctx2.arc(0,0,90,0,Math.PI*2);
-		ctx2.stroke();
-		ctx2.restore();
-
-
-		//用循环表盘针
-		ctx2.save();
-		ctx2.beginPath();
-		ctx2.strokeStyle = '#333';
-		ctx2.lineWidth = 5;
-		//花了表盘的内表盘
-		ctx2.arc(0,0,60,0,Math.PI*2);
-		ctx2.stroke();
-		ctx2.lineWidth = 4;
-		ctx2.lineCap = 'round';
-		for (var i = 1; i < 61; i++) {
-			ctx2.rotate(Math.PI/30);
-			ctx2.beginPath();
-			if(i%5 == 0){
-				ctx2.lineWidth = 4;
-				ctx2.moveTo(48,0);
-			}else{
-				ctx2.lineWidth = 2;
-				ctx2.moveTo(55,0);
-			}
-			ctx2.lineTo(60,0);
-			ctx2.stroke();
-		};
-
-		ctx2.restore();
-
-		//时钟时针
-		ctx2.save();
-		ctx2.rotate((360*(h*60*60+m*60+s)/43200)/180*Math.PI);
-		ctx2.beginPath();
-		ctx2.lineWidth = 12;
-		ctx2.moveTo(0,20);ctx.lineCap = 'round';
-		ctx2.lineTo(0,-100);
-		ctx2.stroke();
-		ctx2.restore();
-
-		//时钟分针
-		ctx2.save();
-		
-		ctx2.rotate((360*(m*60+s)/3600)/180*Math.PI);
-
-		ctx2.beginPath();
-		ctx2.strokeStyle = '#000';
-		ctx2.lineWidth = 8;
-		ctx2.lineCap = 'round';
-		ctx2.moveTo(0,20);
-		ctx2.lineTo(0,-160);
-		ctx2.stroke();
-		ctx2.restore();
-
-
-		
-		//表盘秒针
-		ctx2.save();
-		// ctx.rotate(x);
-		ctx2.rotate(Math.PI/30*s);
-
-		ctx2.beginPath();
-		ctx2.strokeStyle = '#f00';
-		ctx2.lineWidth = 8;
-		ctx2.lineCap = 'round';
-		ctx2.moveTo(0,20);
-		ctx2.lineTo(0,-150);
-		ctx2.stroke();
-		ctx2.moveTo(0,-150);
-		ctx2.fillStyle = '#f00';
-		ctx2.arc(0,-100,12,0,Math.PI*2);
-		ctx2.fill();
-		ctx2.save();
-		ctx2.beginPath();
-		ctx2.fillStyle = '#fff';
-		ctx2.arc(0,-100,9,0,Math.PI*2);
-		ctx2.fill();
-		ctx2.restore();
-		//时钟原点嵌套的两个圆
-		ctx2.save();
-		ctx2.beginPath();
-		ctx2.fillStyle = 'red';
-		ctx2.arc(0,0,10,0,Math.PI*2);
-		ctx2.fill();
-		ctx2.restore();
-		ctx2.save();
-		ctx2.restore();
-		ctx2.beginPath();
-		ctx2.fillStyle = '#535353';
-		ctx2.arc(0,0,5,0,Math.PI*2);
-		ctx2.fill();
-	    ctx2.restore();
-		
-
-	//复原干净的画布
-		ctx2.restore();
-		requestAnimationFrame(drawClock);
-	}
-   //复原一开始保存的干净的画布状态
-   ctx2.restore();
-   // drawClock();
-   requestAnimationFrame(drawClock);*/
-
-
-
-
-
 
 }
 
